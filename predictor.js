@@ -147,9 +147,9 @@ function runPrediction() {
 
     let hazardRatio = Math.exp(lp);
 
-    // 9. Survival Probabilities
-    let s0_3yr = getBaselineS0(36); // 36 months
-    let s0_5yr = getBaselineS0(60); // 60 months
+    // 9. Survival Probabilities (time_to_event is in DAYS)
+    let s0_3yr = getBaselineS0(1095); // 3 years * 365 days
+    let s0_5yr = getBaselineS0(1825); // 5 years * 365 days
 
     let s_3yr = Math.pow(s0_3yr, hazardRatio);
     let s_5yr = Math.pow(s0_5yr, hazardRatio);
