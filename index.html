@@ -25,9 +25,9 @@
                 <form id="prediction-form">
                     
                     <div class="form-grid">
-                        <!-- Group 1: 基础与遗传信息 -->
+                        <!-- 基本信息 -->
                         <div class="input-group">
-                            <h3>基础与遗传信息</h3>
+                            <h3>基础信息 (Basic Info)</h3>
                             <div class="field">
                                 <label for="age_months">年龄 (月)</label>
                                 <input type="number" id="age_months" name="age_months" step="any">
@@ -49,14 +49,45 @@
                                     <option value="3">高危 (HR)</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <!-- C1 肿瘤负荷 -->
+                        <div class="input-group">
+                            <h3>C1 肿瘤负荷 (Tumor Burden)</h3>
+                            <div class="field"><label for="wbc">WBC 白细胞 (10^9/L)</label><input type="number" id="wbc" step="any"></div>
+                            <div class="field"><label for="ldh">LDH 乳酸脱氢酶 (U/L)</label><input type="number" id="ldh" step="any"></div>
+                            <div class="field"><label for="uric_acid">Uric Acid 尿酸 (umol/L)</label><input type="number" id="uric_acid" step="any"></div>
+                            <div class="field"><label for="plt">PLT 血小板 (10^9/L)</label><input type="number" id="plt" step="any"></div>
+                        </div>
+
+                        <!-- C2 免疫微环境 -->
+                        <div class="input-group">
+                            <h3>C2 免疫微环境 (Immune Profile)</h3>
+                            <div class="field"><label for="anc">ANC 中性粒细胞 (10^9/L)</label><input type="number" id="anc" step="any"></div>
+                            <div class="field"><label for="monocyte">Monocyte 单核细胞 (10^9/L)</label><input type="number" id="monocyte" step="any"></div>
+                            <div class="field"><label for="alc">ALC 淋巴细胞 (10^9/L)</label><input type="number" id="alc" step="any"></div>
                             <div class="field">
-                                <label for="immuno_clean">免疫分型</label>
+                                <label for="immuno_clean">Immuno 免疫分型</label>
                                 <select id="immuno_clean" name="immuno_clean">
                                     <option value="">请选择...</option>
                                     <option value="B">B-ALL</option>
                                     <option value="T">T-ALL</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <!-- C3 神经系统侵袭 -->
+                        <div class="input-group">
+                            <h3>C3 神经系统侵袭 (CNS Invasion)</h3>
+                            <div class="field"><label for="csf_wbc">CSF WBC 脑脊液白细胞 (x10^6/L)</label><input type="number" id="csf_wbc" step="any"></div>
+                            <div class="field"><label for="csf_rbc">CSF RBC 脑脊液红细胞 (x10^6/L)</label><input type="number" id="csf_rbc" step="any"></div>
+                            <div class="field"><label for="csf_protein">CSF Protein 脑脊液蛋白 (g/L)</label><input type="number" id="csf_protein" step="any"></div>
+                            <div class="field"><label for="csf_glucose">CSF Glucose 脑脊液葡萄糖 (mmol/L)</label><input type="number" id="csf_glucose" step="any"></div>
+                        </div>
+
+                        <!-- C4 遗传风险 -->
+                        <div class="input-group">
+                            <h3>C4 遗传风险 (Genetic Risk)</h3>
                             <div class="field">
                                 <label for="fusion_gene_code">融合基因分型</label>
                                 <select id="fusion_gene_code" name="fusion_gene_code">
@@ -71,51 +102,25 @@
                             </div>
                         </div>
 
-                        <!-- Group 2: 血常规 -->
+                        <!-- C5 炎症与凝血 -->
                         <div class="input-group">
-                            <h3>血常规指标</h3>
-                            <div class="field"><label for="wbc">WBC (10^9/L)</label><input type="number" id="wbc" step="any"></div>
-                            <div class="field"><label for="plt">PLT (10^9/L)</label><input type="number" id="plt" step="any"></div>
-                            <div class="field"><label for="anc">ANC (10^9/L)</label><input type="number" id="anc" step="any"></div>
-                            <div class="field"><label for="monocyte">Monocyte (10^9/L)</label><input type="number" id="monocyte" step="any"></div>
-                            <div class="field"><label for="alc">ALC (10^9/L)</label><input type="number" id="alc" step="any"></div>
-                        </div>
-
-                        <!-- Group 3: 脑脊液常规 -->
-                        <div class="input-group">
-                            <h3>脑脊液指标 (CSF)</h3>
-                            <div class="field"><label for="csf_wbc">CSF WBC (x10^6/L)</label><input type="number" id="csf_wbc" step="any"></div>
-                            <div class="field"><label for="csf_rbc">CSF RBC (x10^6/L)</label><input type="number" id="csf_rbc" step="any"></div>
-                            <div class="field"><label for="csf_protein">CSF 蛋白 (g/L)</label><input type="number" id="csf_protein" step="any"></div>
-                            <div class="field"><label for="csf_glucose">CSF 葡萄糖 (mmol/L)</label><input type="number" id="csf_glucose" step="any"></div>
-                        </div>
-
-                        <!-- Group 4: 炎症与生化 -->
-                        <div class="input-group">
-                            <h3>生化与炎症标志物</h3>
-                            <div class="field"><label for="ldh">LDH (U/L)</label><input type="number" id="ldh" step="any"></div>
-                            <div class="field"><label for="uric_acid">尿酸 (umol/L)</label><input type="number" id="uric_acid" step="any"></div>
-                            <div class="field"><label for="crp">CRP (mg/L)</label><input type="number" id="crp" step="any"></div>
-                            <div class="field"><label for="pct">PCT (ng/mL)</label><input type="number" id="pct" step="any"></div>
-                        </div>
-
-                        <!-- Group 5: 肝功能与营养 -->
-                        <div class="input-group">
-                            <h3>肝功能与营养</h3>
-                            <div class="field"><label for="albumin">白蛋白 (g/L)</label><input type="number" id="albumin" step="any"></div>
-                            <div class="field"><label for="prealbumin">前白蛋白 (mg/L)</label><input type="number" id="prealbumin" step="any"></div>
-                            <div class="field"><label for="ast">AST (U/L)</label><input type="number" id="ast" step="any"></div>
-                            <div class="field"><label for="alt">ALT (U/L)</label><input type="number" id="alt" step="any"></div>
-                            <div class="field"><label for="alp">ALP (U/L)</label><input type="number" id="alp" step="any"></div>
-                        </div>
-
-                        <!-- Group 6: 凝血功能 -->
-                        <div class="input-group">
-                            <h3>凝血功能</h3>
-                            <div class="field"><label for="d_dimer">D-二聚体 (mg/L)</label><input type="number" id="d_dimer" step="any"></div>
-                            <div class="field"><label for="pt">PT (s)</label><input type="number" id="pt" step="any"></div>
+                            <h3>C5 炎症与凝血 (Inflammation & Coag)</h3>
+                            <div class="field"><label for="crp">CRP C反应蛋白 (mg/L)</label><input type="number" id="crp" step="any"></div>
+                            <div class="field"><label for="pct">PCT 降钙素原 (ng/mL)</label><input type="number" id="pct" step="any"></div>
+                            <div class="field"><label for="d_dimer">D-Dimer D二聚体 (mg/L)</label><input type="number" id="d_dimer" step="any"></div>
+                            <div class="field"><label for="pt">PT 凝血酶原时间 (s)</label><input type="number" id="pt" step="any"></div>
                             <div class="field"><label for="aptt">APTT (s)</label><input type="number" id="aptt" step="any"></div>
-                            <div class="field"><label for="fibrinogen">纤维蛋白原 (g/L)</label><input type="number" id="fibrinogen" step="any"></div>
+                            <div class="field"><label for="fibrinogen">Fibrinogen 纤维蛋白原 (g/L)</label><input type="number" id="fibrinogen" step="any"></div>
+                        </div>
+
+                        <!-- C6 营养与肝功能 -->
+                        <div class="input-group">
+                            <h3>C6 营养与肝功能 (Nutri & Liver)</h3>
+                            <div class="field"><label for="albumin">Albumin 白蛋白 (g/L)</label><input type="number" id="albumin" step="any"></div>
+                            <div class="field"><label for="prealbumin">Prealbumin 前白蛋白 (mg/L)</label><input type="number" id="prealbumin" step="any"></div>
+                            <div class="field"><label for="ast">AST 谷草转氨酶 (U/L)</label><input type="number" id="ast" step="any"></div>
+                            <div class="field"><label for="alt">ALT 谷丙转氨酶 (U/L)</label><input type="number" id="alt" step="any"></div>
+                            <div class="field"><label for="alp">ALP 碱性磷酸酶 (U/L)</label><input type="number" id="alp" step="any"></div>
                         </div>
                     </div>
 

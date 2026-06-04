@@ -5,6 +5,7 @@ import pandas as pd
 
 BASE_DIR = r"d:\work_521"
 PROCESSED_DIR = os.path.join(BASE_DIR, "02_processed_data")
+FINAL_DIR = os.path.join(BASE_DIR, "04_final_model")
 MODEL_DIR = os.path.join(BASE_DIR, "05_models")
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 os.makedirs(FRONTEND_DIR, exist_ok=True)
@@ -17,7 +18,6 @@ def main():
     coef_dict = cox.params_.to_dict()
     
     # Extract baseline survival
-    # baseline_survival_ is a DataFrame indexed by time
     baseline_surv_df = cox.baseline_survival_
     baseline_times = baseline_surv_df.index.tolist()
     baseline_probs = baseline_surv_df.iloc[:, 0].tolist()
@@ -33,6 +33,17 @@ def main():
     with open(os.path.join(PROCESSED_DIR, "pca_params.json"), "r", encoding="utf-8") as f:
         pca_params = json.load(f)
         
+    # --- NEW: Extract PCA mean_ from training set ---
+    print("Extracting exact PCA mean_ values from processed_data_final.csv...")
+    df_final = pd.read_csv(os.path.join(FINAL_DIR, "processed_data_final.csv"))
+    df_train = df_final[df_final["dataset"] == "train"]
+    
+    for c_name, p_data in pca_params.items():
+        features = p_data["features"]
+        # Calculate exact mean for the training set (what PCA fits)
+        means = df_train[features].mean().tolist()
+        pca_params[c_name]["mean"] = means
+
     # Combine all
     model_config = {
         "impute_params": impute_params,

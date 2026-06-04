@@ -57,10 +57,10 @@ function runPrediction() {
     });
 
     // 2. Ratios & Safe Division
-    let alc = Math.max(d.alc, 0.01);
-    let wbc = Math.max(d.wbc, 0.01);
-    let alt = Math.max(d.alt, 0.01);
-    let csf_prot = Math.max(d.csf_protein, 0.01);
+    let alc = d.alc === 0 ? 0.01 : d.alc;
+    let wbc = d.wbc === 0 ? 0.01 : d.wbc;
+    let alt = d.alt === 0 ? 0.01 : d.alt;
+    let csf_prot = d.csf_protein === 0 ? 0.01 : d.csf_protein;
 
     d.nlr_raw = d.anc / alc;
     d.plr_raw = d.plt / alc;
@@ -115,7 +115,8 @@ function runPrediction() {
         for (let i = 0; i < pData.features.length; i++) {
             let f = pData.features[i];
             let w = pData.weights[i];
-            score += (z[f] || 0) * w;
+            let mean = pData.mean[i];
+            score += ((z[f] || 0) - mean) * w;
         }
         concepts[cName] = score;
     }
