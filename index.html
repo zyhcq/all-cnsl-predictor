@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALL CNSL 复发风险预测系统</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for Radar Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="glass-panel">
+            <h1>儿童 ALL 中枢系统受累预测模型</h1>
+            <p class="subtitle">Domain Concept Bottleneck Cox Model</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Left Column: Input Form -->
+            <section class="input-section glass-panel">
+                <h2>患者基线特征录入</h2>
+                <form id="prediction-form">
+                    
+                    <div class="form-grid">
+                        <!-- Group 1: 基础与遗传信息 -->
+                        <div class="input-group">
+                            <h3>基础与遗传信息</h3>
+                            <div class="field">
+                                <label for="age_months">年龄 (月)</label>
+                                <input type="number" id="age_months" name="age_months" step="any">
+                            </div>
+                            <div class="field">
+                                <label for="sex">性别</label>
+                                <select id="sex" name="sex">
+                                    <option value="">请选择...</option>
+                                    <option value="1">男</option>
+                                    <option value="2">女</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="risk_code">临床危险度分层</label>
+                                <select id="risk_code" name="risk_code">
+                                    <option value="">请选择...</option>
+                                    <option value="1">标危 (SR)</option>
+                                    <option value="2">中危 (IR)</option>
+                                    <option value="3">高危 (HR)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="immuno_clean">免疫分型</label>
+                                <select id="immuno_clean" name="immuno_clean">
+                                    <option value="">请选择...</option>
+                                    <option value="B">B-ALL</option>
+                                    <option value="T">T-ALL</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="fusion_gene_code">融合基因分型</label>
+                                <select id="fusion_gene_code" name="fusion_gene_code">
+                                    <option value="">请选择...</option>
+                                    <option value="1">ETV6-RUNX1 (TEL-AML1)</option>
+                                    <option value="2">TCF3-PBX1 (E2A-PBX1)</option>
+                                    <option value="3">BCR-ABL1</option>
+                                    <option value="4">KMT2A (MLL) 重排</option>
+                                    <option value="5">其他阳性</option>
+                                    <option value="0">阴性/无</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Group 2: 血常规 -->
+                        <div class="input-group">
+                            <h3>血常规指标</h3>
+                            <div class="field"><label for="wbc">WBC (10^9/L)</label><input type="number" id="wbc" step="any"></div>
+                            <div class="field"><label for="plt">PLT (10^9/L)</label><input type="number" id="plt" step="any"></div>
+                            <div class="field"><label for="anc">ANC (10^9/L)</label><input type="number" id="anc" step="any"></div>
+                            <div class="field"><label for="monocyte">Monocyte (10^9/L)</label><input type="number" id="monocyte" step="any"></div>
+                            <div class="field"><label for="alc">ALC (10^9/L)</label><input type="number" id="alc" step="any"></div>
+                        </div>
+
+                        <!-- Group 3: 脑脊液常规 -->
+                        <div class="input-group">
+                            <h3>脑脊液指标 (CSF)</h3>
+                            <div class="field"><label for="csf_wbc">CSF WBC (x10^6/L)</label><input type="number" id="csf_wbc" step="any"></div>
+                            <div class="field"><label for="csf_rbc">CSF RBC (x10^6/L)</label><input type="number" id="csf_rbc" step="any"></div>
+                            <div class="field"><label for="csf_protein">CSF 蛋白 (g/L)</label><input type="number" id="csf_protein" step="any"></div>
+                            <div class="field"><label for="csf_glucose">CSF 葡萄糖 (mmol/L)</label><input type="number" id="csf_glucose" step="any"></div>
+                        </div>
+
+                        <!-- Group 4: 炎症与生化 -->
+                        <div class="input-group">
+                            <h3>生化与炎症标志物</h3>
+                            <div class="field"><label for="ldh">LDH (U/L)</label><input type="number" id="ldh" step="any"></div>
+                            <div class="field"><label for="uric_acid">尿酸 (umol/L)</label><input type="number" id="uric_acid" step="any"></div>
+                            <div class="field"><label for="crp">CRP (mg/L)</label><input type="number" id="crp" step="any"></div>
+                            <div class="field"><label for="pct">PCT (ng/mL)</label><input type="number" id="pct" step="any"></div>
+                        </div>
+
+                        <!-- Group 5: 肝功能与营养 -->
+                        <div class="input-group">
+                            <h3>肝功能与营养</h3>
+                            <div class="field"><label for="albumin">白蛋白 (g/L)</label><input type="number" id="albumin" step="any"></div>
+                            <div class="field"><label for="prealbumin">前白蛋白 (mg/L)</label><input type="number" id="prealbumin" step="any"></div>
+                            <div class="field"><label for="ast">AST (U/L)</label><input type="number" id="ast" step="any"></div>
+                            <div class="field"><label for="alt">ALT (U/L)</label><input type="number" id="alt" step="any"></div>
+                            <div class="field"><label for="alp">ALP (U/L)</label><input type="number" id="alp" step="any"></div>
+                        </div>
+
+                        <!-- Group 6: 凝血功能 -->
+                        <div class="input-group">
+                            <h3>凝血功能</h3>
+                            <div class="field"><label for="d_dimer">D-二聚体 (mg/L)</label><input type="number" id="d_dimer" step="any"></div>
+                            <div class="field"><label for="pt">PT (s)</label><input type="number" id="pt" step="any"></div>
+                            <div class="field"><label for="aptt">APTT (s)</label><input type="number" id="aptt" step="any"></div>
+                            <div class="field"><label for="fibrinogen">纤维蛋白原 (g/L)</label><input type="number" id="fibrinogen" step="any"></div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="predict-btn" class="primary-btn">开始预测</button>
+                    <button type="button" id="fill-mock-btn" class="secondary-btn">填充模拟数据</button>
+                </form>
+            </section>
+
+            <!-- Right Column: Results -->
+            <section class="results-section glass-panel">
+                <h2>预测结果分析</h2>
+                
+                <div class="risk-card">
+                    <div class="risk-item">
+                        <span class="risk-label">3年内 CNSL 复发风险</span>
+                        <span class="risk-value" id="risk-3yr">--%</span>
+                    </div>
+                    <div class="risk-item">
+                        <span class="risk-label">5年内 CNSL 复发风险</span>
+                        <span class="risk-value" id="risk-5yr">--%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="risk-bar"></div></div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                
+                <div class="concept-scores" id="concept-scores">
+                    <!-- Concept scores will be injected here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="model_config.js"></script>
+    <script src="predictor.js"></script>
+</body>
+</html>
