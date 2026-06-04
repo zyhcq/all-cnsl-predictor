@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALL CNSL 复发风险预测系统</title>
+    <title>Pediatric ALL CNSL Recurrence Predictor</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js for Radar Chart -->
@@ -13,133 +13,141 @@
 <body>
     <div class="app-container">
         <!-- Header -->
-        <header class="glass-panel">
-            <h1>儿童 ALL 中枢系统受累预测模型</h1>
-            <p class="subtitle">Domain Concept Bottleneck Cox Model</p>
+        <header class="header-panel">
+            <h1>Pediatric ALL CNSL Recurrence Risk Predictor</h1>
+            <p class="subtitle">Based on Domain Concept Bottleneck Cox Model</p>
         </header>
 
         <main class="main-content">
             <!-- Left Column: Input Form -->
-            <section class="input-section glass-panel">
-                <h2>患者基线特征录入</h2>
+            <section class="input-section card-panel">
+                <h2>Baseline Characteristics</h2>
                 <form id="prediction-form">
                     
-                    <div class="form-grid">
-                        <!-- 基本信息 -->
-                        <div class="input-group">
-                            <h3>基础信息 (Basic Info)</h3>
-                            <div class="field">
-                                <label for="age_months">年龄 (月)</label>
-                                <input type="number" id="age_months" name="age_months" step="any">
+                    <div class="form-columns">
+                        <!-- LEFT COLUMN -->
+                        <div class="form-col">
+                            <!-- Basic Info -->
+                            <div class="input-group">
+                                <h3>Baseline Demographics</h3>
+                                <div class="field">
+                                    <label for="age_months">Age (months)</label>
+                                    <input type="number" id="age_months" name="age_months" step="any">
+                                </div>
+                                <div class="field">
+                                    <label for="sex">Sex</label>
+                                    <select id="sex" name="sex">
+                                        <option value="">Select...</option>
+                                        <option value="1">Male</option>
+                                        <option value="2">Female</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label for="risk_code">Clinical Risk Stratification</label>
+                                    <select id="risk_code" name="risk_code">
+                                        <option value="">Select...</option>
+                                        <option value="1">Standard Risk (SR)</option>
+                                        <option value="2">Intermediate Risk (IR)</option>
+                                        <option value="3">High Risk (HR)</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="field">
-                                <label for="sex">性别</label>
-                                <select id="sex" name="sex">
-                                    <option value="">请选择...</option>
-                                    <option value="1">男</option>
-                                    <option value="2">女</option>
-                                </select>
+
+                            <!-- C2 免疫微环境 -->
+                            <div class="input-group">
+                                <h3>C2. Immune Microenvironment</h3>
+                                <div class="field"><label for="anc">ANC (10^9/L)</label><input type="number" id="anc" step="any"></div>
+                                <div class="field"><label for="monocyte">Monocyte (10^9/L)</label><input type="number" id="monocyte" step="any"></div>
+                                <div class="field"><label for="alc">ALC (10^9/L)</label><input type="number" id="alc" step="any"></div>
+                                <div class="field">
+                                    <label for="immuno_clean">Immunophenotype</label>
+                                    <select id="immuno_clean" name="immuno_clean">
+                                        <option value="">Select...</option>
+                                        <option value="B">B-ALL</option>
+                                        <option value="T">T-ALL</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="field">
-                                <label for="risk_code">临床危险度分层</label>
-                                <select id="risk_code" name="risk_code">
-                                    <option value="">请选择...</option>
-                                    <option value="1">标危 (SR)</option>
-                                    <option value="2">中危 (IR)</option>
-                                    <option value="3">高危 (HR)</option>
-                                </select>
+
+                            <!-- C4 遗传风险 -->
+                            <div class="input-group">
+                                <h3>C4. Genetic Risk</h3>
+                                <div class="field">
+                                    <label for="fusion_gene_code">Fusion Gene</label>
+                                    <select id="fusion_gene_code" name="fusion_gene_code">
+                                        <option value="">Select...</option>
+                                        <option value="1">ETV6-RUNX1 (TEL-AML1)</option>
+                                        <option value="2">TCF3-PBX1 (E2A-PBX1)</option>
+                                        <option value="3">BCR-ABL1</option>
+                                        <option value="4">KMT2A (MLL) rearrangement</option>
+                                        <option value="5">Other Positive</option>
+                                        <option value="0">Negative/None</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- C1 肿瘤负荷 -->
-                        <div class="input-group">
-                            <h3>C1 肿瘤负荷 (Tumor Burden)</h3>
-                            <div class="field"><label for="wbc">WBC 白细胞 (10^9/L)</label><input type="number" id="wbc" step="any"></div>
-                            <div class="field"><label for="ldh">LDH 乳酸脱氢酶 (U/L)</label><input type="number" id="ldh" step="any"></div>
-                            <div class="field"><label for="uric_acid">Uric Acid 尿酸 (umol/L)</label><input type="number" id="uric_acid" step="any"></div>
-                            <div class="field"><label for="plt">PLT 血小板 (10^9/L)</label><input type="number" id="plt" step="any"></div>
-                        </div>
-
-                        <!-- C2 免疫微环境 -->
-                        <div class="input-group">
-                            <h3>C2 免疫微环境 (Immune Profile)</h3>
-                            <div class="field"><label for="anc">ANC 中性粒细胞 (10^9/L)</label><input type="number" id="anc" step="any"></div>
-                            <div class="field"><label for="monocyte">Monocyte 单核细胞 (10^9/L)</label><input type="number" id="monocyte" step="any"></div>
-                            <div class="field"><label for="alc">ALC 淋巴细胞 (10^9/L)</label><input type="number" id="alc" step="any"></div>
-                            <div class="field">
-                                <label for="immuno_clean">Immuno 免疫分型</label>
-                                <select id="immuno_clean" name="immuno_clean">
-                                    <option value="">请选择...</option>
-                                    <option value="B">B-ALL</option>
-                                    <option value="T">T-ALL</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- C3 神经系统侵袭 -->
-                        <div class="input-group">
-                            <h3>C3 神经系统侵袭 (CNS Invasion)</h3>
-                            <div class="field"><label for="csf_wbc">CSF WBC 脑脊液白细胞 (x10^6/L)</label><input type="number" id="csf_wbc" step="any"></div>
-                            <div class="field"><label for="csf_rbc">CSF RBC 脑脊液红细胞 (x10^6/L)</label><input type="number" id="csf_rbc" step="any"></div>
-                            <div class="field"><label for="csf_protein">CSF Protein 脑脊液蛋白 (g/L)</label><input type="number" id="csf_protein" step="any"></div>
-                            <div class="field"><label for="csf_glucose">CSF Glucose 脑脊液葡萄糖 (mmol/L)</label><input type="number" id="csf_glucose" step="any"></div>
-                        </div>
-
-                        <!-- C4 遗传风险 -->
-                        <div class="input-group">
-                            <h3>C4 遗传风险 (Genetic Risk)</h3>
-                            <div class="field">
-                                <label for="fusion_gene_code">融合基因分型</label>
-                                <select id="fusion_gene_code" name="fusion_gene_code">
-                                    <option value="">请选择...</option>
-                                    <option value="1">ETV6-RUNX1 (TEL-AML1)</option>
-                                    <option value="2">TCF3-PBX1 (E2A-PBX1)</option>
-                                    <option value="3">BCR-ABL1</option>
-                                    <option value="4">KMT2A (MLL) 重排</option>
-                                    <option value="5">其他阳性</option>
-                                    <option value="0">阴性/无</option>
-                                </select>
+                            <!-- C6 营养与肝功能 -->
+                            <div class="input-group">
+                                <h3>C6. Nutritional & Hepatic Status</h3>
+                                <div class="field"><label for="albumin">Albumin (g/L)</label><input type="number" id="albumin" step="any"></div>
+                                <div class="field"><label for="prealbumin">Prealbumin (mg/L)</label><input type="number" id="prealbumin" step="any"></div>
+                                <div class="field"><label for="ast">AST (U/L)</label><input type="number" id="ast" step="any"></div>
+                                <div class="field"><label for="alt">ALT (U/L)</label><input type="number" id="alt" step="any"></div>
+                                <div class="field"><label for="alp">ALP (U/L)</label><input type="number" id="alp" step="any"></div>
                             </div>
                         </div>
 
-                        <!-- C5 炎症与凝血 -->
-                        <div class="input-group">
-                            <h3>C5 炎症与凝血 (Inflammation & Coag)</h3>
-                            <div class="field"><label for="crp">CRP C反应蛋白 (mg/L)</label><input type="number" id="crp" step="any"></div>
-                            <div class="field"><label for="pct">PCT 降钙素原 (ng/mL)</label><input type="number" id="pct" step="any"></div>
-                            <div class="field"><label for="d_dimer">D-Dimer D二聚体 (mg/L)</label><input type="number" id="d_dimer" step="any"></div>
-                            <div class="field"><label for="pt">PT 凝血酶原时间 (s)</label><input type="number" id="pt" step="any"></div>
-                            <div class="field"><label for="aptt">APTT (s)</label><input type="number" id="aptt" step="any"></div>
-                            <div class="field"><label for="fibrinogen">Fibrinogen 纤维蛋白原 (g/L)</label><input type="number" id="fibrinogen" step="any"></div>
-                        </div>
+                        <!-- RIGHT COLUMN -->
+                        <div class="form-col">
+                            <!-- C1 肿瘤负荷 -->
+                            <div class="input-group">
+                                <h3>C1. Tumor Burden</h3>
+                                <div class="field"><label for="wbc">WBC (10^9/L)</label><input type="number" id="wbc" step="any"></div>
+                                <div class="field"><label for="ldh">LDH (U/L)</label><input type="number" id="ldh" step="any"></div>
+                                <div class="field"><label for="uric_acid">Uric Acid (umol/L)</label><input type="number" id="uric_acid" step="any"></div>
+                                <div class="field"><label for="plt">Platelet (10^9/L)</label><input type="number" id="plt" step="any"></div>
+                            </div>
 
-                        <!-- C6 营养与肝功能 -->
-                        <div class="input-group">
-                            <h3>C6 营养与肝功能 (Nutri & Liver)</h3>
-                            <div class="field"><label for="albumin">Albumin 白蛋白 (g/L)</label><input type="number" id="albumin" step="any"></div>
-                            <div class="field"><label for="prealbumin">Prealbumin 前白蛋白 (mg/L)</label><input type="number" id="prealbumin" step="any"></div>
-                            <div class="field"><label for="ast">AST 谷草转氨酶 (U/L)</label><input type="number" id="ast" step="any"></div>
-                            <div class="field"><label for="alt">ALT 谷丙转氨酶 (U/L)</label><input type="number" id="alt" step="any"></div>
-                            <div class="field"><label for="alp">ALP 碱性磷酸酶 (U/L)</label><input type="number" id="alp" step="any"></div>
+                            <!-- C3 神经系统侵袭 -->
+                            <div class="input-group">
+                                <h3>C3. CNS Invasion</h3>
+                                <div class="field"><label for="csf_wbc">CSF WBC (x10^6/L)</label><input type="number" id="csf_wbc" step="any"></div>
+                                <div class="field"><label for="csf_rbc">CSF RBC (x10^6/L)</label><input type="number" id="csf_rbc" step="any"></div>
+                                <div class="field"><label for="csf_protein">CSF Protein (g/L)</label><input type="number" id="csf_protein" step="any"></div>
+                                <div class="field"><label for="csf_glucose">CSF Glucose (mmol/L)</label><input type="number" id="csf_glucose" step="any"></div>
+                            </div>
+
+                            <!-- C5 炎症与凝血 -->
+                            <div class="input-group">
+                                <h3>C5. Inflammation & Coagulation</h3>
+                                <div class="field"><label for="crp">CRP (mg/L)</label><input type="number" id="crp" step="any"></div>
+                                <div class="field"><label for="pct">PCT (ng/mL)</label><input type="number" id="pct" step="any"></div>
+                                <div class="field"><label for="d_dimer">D-Dimer (mg/L)</label><input type="number" id="d_dimer" step="any"></div>
+                                <div class="field"><label for="pt">PT (s)</label><input type="number" id="pt" step="any"></div>
+                                <div class="field"><label for="aptt">APTT (s)</label><input type="number" id="aptt" step="any"></div>
+                                <div class="field"><label for="fibrinogen">Fibrinogen (g/L)</label><input type="number" id="fibrinogen" step="any"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <button type="button" id="predict-btn" class="primary-btn">开始预测</button>
-                    <button type="button" id="fill-mock-btn" class="secondary-btn">填充模拟数据</button>
+                    <div class="action-buttons">
+                        <button type="button" id="predict-btn" class="primary-btn">Calculate Risk</button>
+                        <button type="button" id="fill-mock-btn" class="secondary-btn">Load Demo Data</button>
+                    </div>
                 </form>
             </section>
 
             <!-- Right Column: Results -->
-            <section class="results-section glass-panel">
-                <h2>预测结果分析</h2>
+            <section class="results-section card-panel">
+                <h2>Prediction Results</h2>
                 
                 <div class="risk-card">
                     <div class="risk-item">
-                        <span class="risk-label">3年内 CNSL 复发风险</span>
+                        <span class="risk-label">3-Year CNSL Recurrence Risk</span>
                         <span class="risk-value" id="risk-3yr">--%</span>
                     </div>
                     <div class="risk-item">
-                        <span class="risk-label">5年内 CNSL 复发风险</span>
+                        <span class="risk-label">5-Year CNSL Recurrence Risk</span>
                         <span class="risk-value" id="risk-5yr">--%</span>
                     </div>
                     <div class="progress-bar"><div class="progress-fill" id="risk-bar"></div></div>

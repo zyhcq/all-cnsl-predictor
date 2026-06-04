@@ -197,16 +197,16 @@ function initRadarChart(data) {
     radarChartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: ['肿瘤负荷', '免疫微环境', '中枢侵袭', '遗传风险', '炎症与凝血', '营养与肝功能'],
+            labels: ['Tumor Burden', 'Immune Profile', 'CNS Invasion', 'Genetic Risk', 'Inflammation & Coag', 'Nutri & Liver'],
             datasets: [{
-                label: '概念特征得分 (Z-score)',
+                label: 'Concept Score (Z-score)',
                 data: data,
                 backgroundColor: 'rgba(14, 165, 233, 0.2)',
-                borderColor: '#38bdf8',
-                pointBackgroundColor: '#f8fafc',
+                borderColor: '#0ea5e9',
+                pointBackgroundColor: '#ffffff',
                 pointBorderColor: '#0284c7',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: '#38bdf8',
+                pointHoverBackgroundColor: '#ffffff',
+                pointHoverBorderColor: '#0ea5e9',
                 borderWidth: 2
             }]
         },
@@ -215,11 +215,11 @@ function initRadarChart(data) {
             maintainAspectRatio: false,
             scales: {
                 r: {
-                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                    grid: { color: 'rgba(0, 0, 0, 0.1)' },
                     pointLabels: {
-                        color: '#94a3b8',
-                        font: { size: 12, family: 'Inter' }
+                        color: '#475569',
+                        font: { size: 12, family: 'Inter', weight: '500' }
                     },
                     ticks: {
                         display: false, // hide numbers on axis
