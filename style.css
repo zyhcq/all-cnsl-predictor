@@ -83,15 +83,13 @@ h2 {
 }
 
 .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    align-items: start;
+    column-count: 2;
+    column-gap: 1.5rem;
 }
 
 @media (max-width: 768px) {
     .form-grid {
-        grid-template-columns: 1fr;
+        column-count: 1;
     }
 }
 
@@ -100,6 +98,10 @@ h2 {
     border-radius: 12px;
     padding: 1.5rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    width: 100%;
 }
 
 .input-group h3 {
