@@ -165,6 +165,45 @@ function runPrediction() {
     let fillPct = Math.min((risk_5yr / 50.0) * 100, 100);
     document.getElementById('risk-bar').style.width = fillPct + "%";
 
+    // 11. Calculate Contributions for Explainable AI
+    const contribs = [
+        { name: 'C1. Tumor Burden', val: concepts['C1_TumorBurden'] * (coef['C1_TumorBurden'] || 0) },
+        { name: 'C2. Immune Profile', val: concepts['C2_ImmuneProfile'] * (coef['C2_ImmuneProfile'] || 0) },
+        { name: 'C3. CNS Invasion', val: concepts['C3_CNSInvasion'] * (coef['C3_CNSInvasion'] || 0) },
+        { name: 'C4. Genetic Risk', val: concepts['C4_GeneticRisk'] * (coef['C4_GeneticRisk'] || 0) },
+        { name: 'C5. Inflam & Coag', val: concepts['C5_InflamCoag'] * (coef['C5_InflamCoag'] || 0) },
+        { name: 'C6. Nutri & Liver', val: concepts['C6_NutriLiver'] * (coef['C6_NutriLiver'] || 0) },
+        { name: 'High Risk Stratification', val: is_high_risk * (coef['is_high_risk'] || 0) },
+        { name: 'Age Risk', val: is_high_risk_age * (coef['is_high_risk_age'] || 0) },
+        { name: 'Sex (Male)', val: is_male * (coef['is_male'] || 0) }
+    ];
+    
+    let riskDrivers = contribs.filter(c => c.val > 0).sort((a, b) => b.val - a.val);
+    const container = document.getElementById('contributors-container');
+    const listEl = document.getElementById('contributors-list');
+    
+    if (riskDrivers.length > 0) {
+        container.style.display = 'block';
+        listEl.innerHTML = '';
+        const maxVal = riskDrivers[0].val;
+        const topDrivers = riskDrivers.slice(0, 4); 
+        
+        topDrivers.forEach(c => {
+            const pct = Math.max((c.val / maxVal) * 100, 5); // min 5% width for visibility
+            listEl.innerHTML += `
+                <div class="contributor-item">
+                    <div class="contributor-name">${c.name}</div>
+                    <div class="contributor-bar-wrapper">
+                        <div class="contributor-bar-fill" style="width: ${pct}%"></div>
+                    </div>
+                    <div class="contributor-value">+${c.val.toFixed(2)}</div>
+                </div>
+            `;
+        });
+    } else {
+        container.style.display = 'none';
+    }
+
     // Update Radar Chart
     updateRadarChart([
         concepts['C1_TumorBurden'],

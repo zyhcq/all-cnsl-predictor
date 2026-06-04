@@ -251,18 +251,58 @@ button {
     margin-bottom: 1.5rem;
 }
 
-.concept-scores {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+.contributors-container {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #fffbfa;
+    border: 1px solid #fee2e2;
+    border-radius: 12px;
 }
 
-.concept-badge {
-    background: #f1f5f9;
-    border: 1px solid #cbd5e1;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
+.contributors-title {
+    font-size: 1rem;
+    color: #b91c1c;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.contributor-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.contributor-item:last-child {
+    margin-bottom: 0;
+}
+
+.contributor-name {
+    font-size: 0.9rem;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: #334155;
+    flex: 1;
+}
+
+.contributor-bar-wrapper {
+    flex: 2;
+    height: 8px;
+    background: #fee2e2;
+    border-radius: 4px;
+    margin: 0 1rem;
+    overflow: hidden;
+}
+
+.contributor-bar-fill {
+    height: 100%;
+    background: #ef4444;
+    border-radius: 4px;
+}
+
+.contributor-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ef4444;
+    width: 60px;
+    text-align: right;
 }
