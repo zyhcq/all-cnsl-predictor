@@ -28,7 +28,7 @@ function getVal(id) {
 function fillMockData() {
     // Fill with high-risk mock values
     const mock = {
-        age_months: 130, sex: 1, risk_code: 3, immuno_clean: "T", fusion_gene_code: 0,
+        age_months: 130, sex: 1, risk_code: 3, immuno_clean: "T", fusion_gene_code: 0, karyo_abn: 1,
         wbc: 120, plt: 20, anc: 0.5, monocyte: 0.8, alc: 0.2,
         csf_wbc: 15, csf_rbc: 0, csf_protein: 0.6, csf_glucose: 2.1,
         ldh: 1500, uric_acid: 600, crp: 45, pct: 2.1,
@@ -109,6 +109,9 @@ function runPrediction() {
     z.fusion_BCR = fusion === 3 ? 1 : 0;
     z.fusion_MLL = fusion === 4 ? 1 : 0;
     z.fusion_other = [5,6,7].includes(fusion) ? 1 : 0;
+
+    let karyo = getVal('karyo_abn') || 0;
+    z.karyo_abn = karyo === 1 ? 1 : 0;
 
     // 6. SPCA Transformation
     let concepts = {};
