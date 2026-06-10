@@ -5,6 +5,8 @@
 // Global radar chart instance
 let radarChartInstance = null;
 
+// Removed toggle state for Option B
+
 // Ensure model config is loaded
 if (typeof MODEL_CONFIG === 'undefined') {
     alert("Error: model_config.js failed to load!");
@@ -108,9 +110,9 @@ function runPrediction() {
     z.fusion_MLL = fusion === 4 ? 1 : 0;
     z.fusion_other = [5,6,7].includes(fusion) ? 1 : 0;
 
-    // 6. PCA Transformation
+    // 6. SPCA Transformation
     let concepts = {};
-    for (const [cName, pData] of Object.entries(MODEL_CONFIG.pca_params)) {
+    for (const [cName, pData] of Object.entries(MODEL_CONFIG.spca_params)) {
         let score = 0;
         for (let i = 0; i < pData.features.length; i++) {
             let f = pData.features[i];
@@ -130,79 +132,131 @@ function runPrediction() {
     let is_high_risk = (risk >= 2) ? 1 : 0;
     let is_male = (sex === 1) ? 1 : 0;
 
-    // 8. Linear Predictor (LP)
-    let lp = 0;
-    const coef = MODEL_CONFIG.cox_params.coefficients;
+    // 8. Linear Predictors (LP)
+    let lp_r = 0;
+    let lp_d = 0;
+    const coef_r = MODEL_CONFIG.cox_relapse.coefficients;
+    const coef_d = MODEL_CONFIG.cox_death.coefficients;
     
-    lp += concepts['C1_TumorBurden'] * (coef['C1_TumorBurden'] || 0);
-    lp += concepts['C2_ImmuneProfile'] * (coef['C2_ImmuneProfile'] || 0);
-    lp += concepts['C3_CNSInvasion'] * (coef['C3_CNSInvasion'] || 0);
-    lp += concepts['C4_GeneticRisk'] * (coef['C4_GeneticRisk'] || 0);
-    lp += concepts['C5_InflamCoag'] * (coef['C5_InflamCoag'] || 0);
-    lp += concepts['C6_NutriLiver'] * (coef['C6_NutriLiver'] || 0);
+    const features_to_add = [
+        {name: 'C1_TumorBurden_SPCA', val: concepts['C1_TumorBurden']},
+        {name: 'C2_ImmuneProfile_SPCA', val: concepts['C2_ImmuneProfile']},
+        {name: 'C3_CNSInvasion_SPCA', val: concepts['C3_CNSInvasion']},
+        {name: 'C4_GeneticRisk_SPCA', val: concepts['C4_GeneticRisk']},
+        {name: 'C5_InflamCoag_SPCA', val: concepts['C5_InflamCoag']},
+        {name: 'C6_NutriLiver_SPCA', val: concepts['C6_NutriLiver']},
+        {name: 'is_high_risk', val: is_high_risk},
+        {name: 'is_high_risk_age', val: is_high_risk_age},
+        {name: 'is_male', val: is_male}
+    ];
+
+    features_to_add.forEach(f => {
+        lp_r += f.val * (coef_r[f.name] || 0);
+        lp_d += f.val * (coef_d[f.name] || 0);
+    });
+
+    let hr_relapse = Math.exp(lp_r);
+    let hr_death = Math.exp(lp_d);
+
+    // 9. Cumulative Incidence Function (CIF) for Competing Risks
+    function getH0(times, hazards, t) {
+        let h = 0;
+        for (let i = 0; i < times.length; i++) {
+            if (times[i] <= t) {
+                h = hazards[i];
+            } else {
+                break;
+            }
+        }
+        return h;
+    }
+
+    let times_r = MODEL_CONFIG.cox_relapse.baseline_cumulative_hazard.times;
+    let times_d = MODEL_CONFIG.cox_death.baseline_cumulative_hazard.times;
+    let all_times = Array.from(new Set([...times_r, ...times_d])).sort((a, b) => a - b);
     
-    lp += is_high_risk * (coef['is_high_risk'] || 0);
-    lp += is_high_risk_age * (coef['is_high_risk_age'] || 0);
-    lp += is_male * (coef['is_male'] || 0);
+    let cif_r_3yr = 0;
+    let cif_r_5yr = 0;
+    let cif_d_3yr = 0;
+    let cif_d_5yr = 0;
+    let prev_S = 1.0;
+    let prev_H_R = 0;
+    let prev_H_D = 0;
+    
+    for (let i = 0; i < all_times.length; i++) {
+        let t = all_times[i];
+        
+        let h0_r = getH0(times_r, MODEL_CONFIG.cox_relapse.baseline_cumulative_hazard.hazards, t);
+        let h0_d = getH0(times_d, MODEL_CONFIG.cox_death.baseline_cumulative_hazard.hazards, t);
+        
+        let H_R = h0_r * hr_relapse;
+        let H_D = h0_d * hr_death;
+        
+        let dH_R = H_R - prev_H_R;
+        let dH_D = H_D - prev_H_D;
+        
+        // Aalen-Johansen discrete approximation
+        if (t <= 1095) {
+            cif_r_3yr += prev_S * (1 - Math.exp(-dH_R));
+            cif_d_3yr += prev_S * (1 - Math.exp(-dH_D));
+        }
+        if (t <= 1825) {
+            cif_r_5yr += prev_S * (1 - Math.exp(-dH_R));
+            cif_d_5yr += prev_S * (1 - Math.exp(-dH_D));
+        }
+        
+        prev_S = Math.exp(-(H_R + H_D));
+        prev_H_R = H_R;
+        prev_H_D = H_D;
+    }
 
-    let hazardRatio = Math.exp(lp);
-
-    // 9. Survival Probabilities (time_to_event is in DAYS)
-    let s0_3yr = getBaselineS0(1095); // 3 years * 365 days
-    let s0_5yr = getBaselineS0(1825); // 5 years * 365 days
-
-    let s_3yr = Math.pow(s0_3yr, hazardRatio);
-    let s_5yr = Math.pow(s0_5yr, hazardRatio);
-
-    let risk_3yr = (1 - s_3yr) * 100;
-    let risk_5yr = (1 - s_5yr) * 100;
+    let risk_3yr = cif_r_3yr * 100;
+    let risk_5yr = cif_r_5yr * 100;
+    let risk_d_3yr = cif_d_3yr * 100;
+    let risk_d_5yr = cif_d_5yr * 100;
 
     // 10. Update UI
     document.getElementById('risk-3yr').innerText = risk_3yr.toFixed(2) + "%";
     document.getElementById('risk-5yr').innerText = risk_5yr.toFixed(2) + "%";
+    document.getElementById('risk-death-3yr').innerText = risk_d_3yr.toFixed(2) + "%";
+    document.getElementById('risk-death-5yr').innerText = risk_d_5yr.toFixed(2) + "%";
     
     // Progress bar fill (max at 50% risk for full visual impact)
-    let fillPct = Math.min((risk_5yr / 50.0) * 100, 100);
-    document.getElementById('risk-bar').style.width = fillPct + "%";
+    document.getElementById('risk-bar-3yr').style.width = Math.min((risk_3yr / 50.0) * 100, 100) + "%";
+    document.getElementById('risk-bar-5yr').style.width = Math.min((risk_5yr / 50.0) * 100, 100) + "%";
+    document.getElementById('risk-bar-death-3yr').style.width = Math.min((risk_d_3yr / 50.0) * 100, 100) + "%";
+    document.getElementById('risk-bar-death-5yr').style.width = Math.min((risk_d_5yr / 50.0) * 100, 100) + "%";
 
     // 11. Calculate Contributions for Explainable AI
-    const contribs = [
-        { name: 'C1. Tumor Burden', val: concepts['C1_TumorBurden'] * (coef['C1_TumorBurden'] || 0) },
-        { name: 'C2. Immune Profile', val: concepts['C2_ImmuneProfile'] * (coef['C2_ImmuneProfile'] || 0) },
-        { name: 'C3. CNS Invasion', val: concepts['C3_CNSInvasion'] * (coef['C3_CNSInvasion'] || 0) },
-        { name: 'C4. Genetic Risk', val: concepts['C4_GeneticRisk'] * (coef['C4_GeneticRisk'] || 0) },
-        { name: 'C5. Inflam & Coag', val: concepts['C5_InflamCoag'] * (coef['C5_InflamCoag'] || 0) },
-        { name: 'C6. Nutri & Liver', val: concepts['C6_NutriLiver'] * (coef['C6_NutriLiver'] || 0) },
-        { name: 'High Risk Stratification', val: is_high_risk * (coef['is_high_risk'] || 0) },
-        { name: 'Age Risk', val: is_high_risk_age * (coef['is_high_risk_age'] || 0) },
-        { name: 'Sex (Male)', val: is_male * (coef['is_male'] || 0) }
+    const contribsR = [
+        { name: 'C1. Tumor Burden', val: concepts['C1_TumorBurden'] * (coef_r['C1_TumorBurden_SPCA'] || 0) },
+        { name: 'C2. Immune Profile', val: concepts['C2_ImmuneProfile'] * (coef_r['C2_ImmuneProfile_SPCA'] || 0) },
+        { name: 'C3. CNS Invasion', val: concepts['C3_CNSInvasion'] * (coef_r['C3_CNSInvasion_SPCA'] || 0) },
+        { name: 'C4. Genetic Risk', val: concepts['C4_GeneticRisk'] * (coef_r['C4_GeneticRisk_SPCA'] || 0) },
+        { name: 'C5. Inflam & Coag', val: concepts['C5_InflamCoag'] * (coef_r['C5_InflamCoag_SPCA'] || 0) },
+        { name: 'C6. Nutri & Liver', val: concepts['C6_NutriLiver'] * (coef_r['C6_NutriLiver_SPCA'] || 0) },
+        { name: 'High Risk Stratification', val: is_high_risk * (coef_r['is_high_risk'] || 0) },
+        { name: 'Age Risk', val: is_high_risk_age * (coef_r['is_high_risk_age'] || 0) },
+        { name: 'Sex (Male)', val: is_male * (coef_r['is_male'] || 0) }
+    ];
+
+    const contribsD = [
+        { name: 'C1. Tumor Burden', val: concepts['C1_TumorBurden'] * (coef_d['C1_TumorBurden_SPCA'] || 0) },
+        { name: 'C2. Immune Profile', val: concepts['C2_ImmuneProfile'] * (coef_d['C2_ImmuneProfile_SPCA'] || 0) },
+        { name: 'C3. CNS Invasion', val: concepts['C3_CNSInvasion'] * (coef_d['C3_CNSInvasion_SPCA'] || 0) },
+        { name: 'C4. Genetic Risk', val: concepts['C4_GeneticRisk'] * (coef_d['C4_GeneticRisk_SPCA'] || 0) },
+        { name: 'C5. Inflam & Coag', val: concepts['C5_InflamCoag'] * (coef_d['C5_InflamCoag_SPCA'] || 0) },
+        { name: 'C6. Nutri & Liver', val: concepts['C6_NutriLiver'] * (coef_d['C6_NutriLiver_SPCA'] || 0) },
+        { name: 'High Risk Stratification', val: is_high_risk * (coef_d['is_high_risk'] || 0) },
+        { name: 'Age Risk', val: is_high_risk_age * (coef_d['is_high_risk_age'] || 0) },
+        { name: 'Sex (Male)', val: is_male * (coef_d['is_male'] || 0) }
     ];
     
-    let riskDrivers = contribs.filter(c => c.val > 0).sort((a, b) => b.val - a.val);
-    const container = document.getElementById('contributors-container');
-    const listEl = document.getElementById('contributors-list');
+    document.getElementById('contributors-container-r').style.display = 'block';
+    document.getElementById('contributors-container-d').style.display = 'block';
     
-    if (riskDrivers.length > 0) {
-        container.style.display = 'block';
-        listEl.innerHTML = '';
-        const maxVal = riskDrivers[0].val;
-        const topDrivers = riskDrivers.slice(0, 4); 
-        
-        topDrivers.forEach(c => {
-            const pct = Math.max((c.val / maxVal) * 100, 5); // min 5% width for visibility
-            listEl.innerHTML += `
-                <div class="contributor-item">
-                    <div class="contributor-name">${c.name}</div>
-                    <div class="contributor-bar-wrapper">
-                        <div class="contributor-bar-fill" style="width: ${pct}%"></div>
-                    </div>
-                    <div class="contributor-value">+${c.val.toFixed(2)}</div>
-                </div>
-            `;
-        });
-    } else {
-        container.style.display = 'none';
-    }
+    renderPanel('contributors-list-r', contribsR, '#e0f2fe', '#0ea5e9');
+    renderPanel('contributors-list-d', contribsD, '#fee2e2', '#ef4444');
 
     // Update Radar Chart
     updateRadarChart([
@@ -213,22 +267,6 @@ function runPrediction() {
         concepts['C5_InflamCoag'],
         concepts['C6_NutriLiver']
     ]);
-}
-
-function getBaselineS0(targetTime) {
-    const times = MODEL_CONFIG.cox_params.baseline_survival.times;
-    const probs = MODEL_CONFIG.cox_params.baseline_survival.probabilities;
-    
-    // Find closest time point (step function)
-    let bestProb = 1.0;
-    for (let i = 0; i < times.length; i++) {
-        if (times[i] <= targetTime) {
-            bestProb = probs[i];
-        } else {
-            break;
-        }
-    }
-    return bestProb;
 }
 
 function initRadarChart(data) {
@@ -278,5 +316,32 @@ function updateRadarChart(data) {
     if (radarChartInstance) {
         radarChartInstance.data.datasets[0].data = data;
         radarChartInstance.update();
+    }
+}
+
+function renderPanel(listId, contribs, bgWrapper, barColor) {
+    let riskDrivers = contribs.filter(c => c.val > 0).sort((a, b) => b.val - a.val);
+    const listEl = document.getElementById(listId);
+    
+    if (riskDrivers.length > 0) {
+        listEl.style.display = 'block';
+        listEl.innerHTML = '';
+        const maxVal = riskDrivers[0].val;
+        const topDrivers = riskDrivers.slice(0, 4); 
+        
+        topDrivers.forEach(c => {
+            const pct = Math.max((c.val / maxVal) * 100, 5); 
+            listEl.innerHTML += `
+                <div class="contributor-item">
+                    <div class="contributor-name">${c.name}</div>
+                    <div class="contributor-bar-wrapper" style="background: ${bgWrapper}">
+                        <div class="contributor-bar-fill" style="width: ${pct}%; background: ${barColor}"></div>
+                    </div>
+                    <div class="contributor-value" style="color: ${barColor}">+${c.val.toFixed(2)}</div>
+                </div>
+            `;
+        });
+    } else {
+        listEl.innerHTML = '<div style="color: #64748b; font-size: 0.9rem; padding: 1rem 0;">No significant positive risk drivers found for this outcome.</div>';
     }
 }

@@ -306,3 +306,36 @@ button {
     width: 60px;
     text-align: right;
 }
+
+/* Toggle Switch Styles */
+.toggle-container {
+    display: flex;
+    background: #e2e8f0;
+    border-radius: 20px;
+    padding: 3px;
+}
+
+.toggle-btn {
+    padding: 5px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 18px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+#toggle-relapse.active {
+    background: #0ea5e9;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#toggle-death.active {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

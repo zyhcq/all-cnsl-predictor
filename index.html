@@ -142,26 +142,45 @@
                 <h2>Prediction Results</h2>
                 
                 <div class="risk-card">
-                    <div class="risk-item">
+                    <div class="risk-item" style="margin-bottom: 0.5rem;">
                         <span class="risk-label">3-Year CNSL Recurrence Risk</span>
                         <span class="risk-value" id="risk-3yr">--%</span>
                     </div>
-                    <div class="risk-item">
+                    <div class="progress-bar" style="margin-bottom: 1.5rem;"><div class="progress-fill" id="risk-bar-3yr"></div></div>
+
+                    <div class="risk-item" style="margin-bottom: 0.5rem;">
                         <span class="risk-label">5-Year CNSL Recurrence Risk</span>
                         <span class="risk-value" id="risk-5yr">--%</span>
                     </div>
-                    <div class="progress-bar"><div class="progress-fill" id="risk-bar"></div></div>
+                    <div class="progress-bar"><div class="progress-fill" id="risk-bar-5yr"></div></div>
+                </div>
+
+                <div class="risk-card death-card" style="margin-top: -1rem; border-color: #fca5a5; background: #fef2f2;">
+                    <div class="risk-item" style="margin-bottom: 0.5rem;">
+                        <span class="risk-label" style="color: #991b1b;">3-Year Competing Death Risk</span>
+                        <span class="risk-value" id="risk-death-3yr" style="color: #dc2626;">--%</span>
+                    </div>
+                    <div class="progress-bar" style="margin-bottom: 1.5rem;"><div class="progress-fill" id="risk-bar-death-3yr" style="background: linear-gradient(90deg, #fcd34d, #f97316, #ef4444);"></div></div>
+
+                    <div class="risk-item" style="margin-bottom: 0.5rem;">
+                        <span class="risk-label" style="color: #991b1b;">5-Year Competing Death Risk</span>
+                        <span class="risk-value" id="risk-death-5yr" style="color: #dc2626;">--%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="risk-bar-death-5yr" style="background: linear-gradient(90deg, #fcd34d, #f97316, #ef4444);"></div></div>
                 </div>
 
                 <div class="chart-container">
                     <canvas id="radarChart"></canvas>
                 </div>
                 
-                <div class="contributors-container" id="contributors-container" style="display: none;">
-                    <h3 class="contributors-title">⚠️ Top Risk Drivers (Explainable AI)</h3>
-                    <div id="contributors-list">
-                        <!-- Contributors will be injected here -->
-                    </div>
+                <div class="contributors-container" id="contributors-container-r" style="display: none; background: #f0f9ff; border-color: #bae6fd;">
+                    <h3 class="contributors-title" style="color: #0369a1; margin-bottom: 1rem;">⚠️ Top Risk Drivers: CNSL Recurrence</h3>
+                    <div id="contributors-list-r"></div>
+                </div>
+
+                <div class="contributors-container" id="contributors-container-d" style="display: none; background: #fffbfa; border-color: #fee2e2;">
+                    <h3 class="contributors-title" style="color: #b91c1c; margin-bottom: 1rem;">⚠️ Top Risk Drivers: Competing Death</h3>
+                    <div id="contributors-list-d"></div>
                 </div>
             </section>
         </main>
