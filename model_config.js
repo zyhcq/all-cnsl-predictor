@@ -310,6 +310,17 @@ const MODEL_CONFIG = {
       "is_high_risk_age": 0.11286447812410452,
       "is_male": 0.14137058732675736
     },
+    "norm_mean": {
+      "C1_TumorBurden_SPCA": 0.03149549146218799,
+      "C2_ImmuneProfile_SPCA": 0.05170537251325868,
+      "C3_CNSInvasion_SPCA": -0.0005876233420362346,
+      "C4_GeneticRisk_SPCA": -2.590520390792032e-17,
+      "C5_InflamCoag_SPCA": 0.015046186712858704,
+      "C6_NutriLiver_SPCA": 0.02178870881253383,
+      "is_high_risk": 0.4583333333333333,
+      "is_high_risk_age": 0.18125,
+      "is_male": 0.58125
+    },
     "baseline_cumulative_hazard": {
       "times": [
         10.22266204,
@@ -2248,6 +2259,17 @@ const MODEL_CONFIG = {
       "is_high_risk": 0.22449563802745456,
       "is_high_risk_age": 0.26423202523495465,
       "is_male": 0.02272340062716309
+    },
+    "norm_mean": {
+      "C1_TumorBurden_SPCA": 0.03149549146218799,
+      "C2_ImmuneProfile_SPCA": 0.05170537251325868,
+      "C3_CNSInvasion_SPCA": -0.0005876233420362346,
+      "C4_GeneticRisk_SPCA": -2.590520390792032e-17,
+      "C5_InflamCoag_SPCA": 0.015046186712858704,
+      "C6_NutriLiver_SPCA": 0.02178870881253383,
+      "is_high_risk": 0.4583333333333333,
+      "is_high_risk_age": 0.18125,
+      "is_male": 0.58125
     },
     "baseline_cumulative_hazard": {
       "times": [

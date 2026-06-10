@@ -19,6 +19,9 @@ def main():
     coef_relapse = cox_relapse.params_.to_dict()
     coef_death = cox_death.params_.to_dict()
     
+    norm_mean_relapse = cox_relapse._norm_mean.to_dict() if hasattr(cox_relapse, '_norm_mean') else {}
+    norm_mean_death = cox_death._norm_mean.to_dict() if hasattr(cox_death, '_norm_mean') else {}
+    
     # Extract baseline cumulative hazard for relapse
     bch_relapse_df = cox_relapse.baseline_cumulative_hazard_
     times_r = bch_relapse_df.index.tolist()
@@ -108,6 +111,7 @@ def main():
         "spca_params": spca_params,
         "cox_relapse": {
             "coefficients": coef_relapse,
+            "norm_mean": norm_mean_relapse,
             "baseline_cumulative_hazard": {
                 "times": times_r,
                 "hazards": hazards_r
@@ -115,6 +119,7 @@ def main():
         },
         "cox_death": {
             "coefficients": coef_death,
+            "norm_mean": norm_mean_death,
             "baseline_cumulative_hazard": {
                 "times": times_d,
                 "hazards": hazards_d

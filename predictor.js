@@ -140,6 +140,8 @@ function runPrediction() {
     let lp_d = 0;
     const coef_r = MODEL_CONFIG.cox_relapse.coefficients;
     const coef_d = MODEL_CONFIG.cox_death.coefficients;
+    const mean_r = MODEL_CONFIG.cox_relapse.norm_mean || {};
+    const mean_d = MODEL_CONFIG.cox_death.norm_mean || {};
     
     const features_to_add = [
         {name: 'C1_TumorBurden_SPCA', val: concepts['C1_TumorBurden']},
@@ -154,8 +156,10 @@ function runPrediction() {
     ];
 
     features_to_add.forEach(f => {
-        lp_r += f.val * (coef_r[f.name] || 0);
-        lp_d += f.val * (coef_d[f.name] || 0);
+        let centered_r = f.val - (mean_r[f.name] || 0);
+        let centered_d = f.val - (mean_d[f.name] || 0);
+        lp_r += centered_r * (coef_r[f.name] || 0);
+        lp_d += centered_d * (coef_d[f.name] || 0);
     });
 
     let hr_relapse = Math.exp(lp_r);
@@ -232,27 +236,27 @@ function runPrediction() {
 
     // 11. Calculate Contributions for Explainable AI
     const contribsR = [
-        { name: 'C1. Tumor Burden', val: concepts['C1_TumorBurden'] * (coef_r['C1_TumorBurden_SPCA'] || 0) },
-        { name: 'C2. Immune Profile', val: concepts['C2_ImmuneProfile'] * (coef_r['C2_ImmuneProfile_SPCA'] || 0) },
-        { name: 'C3. CNS Invasion', val: concepts['C3_CNSInvasion'] * (coef_r['C3_CNSInvasion_SPCA'] || 0) },
-        { name: 'C4. Genetic Risk', val: concepts['C4_GeneticRisk'] * (coef_r['C4_GeneticRisk_SPCA'] || 0) },
-        { name: 'C5. Inflam & Coag', val: concepts['C5_InflamCoag'] * (coef_r['C5_InflamCoag_SPCA'] || 0) },
-        { name: 'C6. Nutri & Liver', val: concepts['C6_NutriLiver'] * (coef_r['C6_NutriLiver_SPCA'] || 0) },
-        { name: 'High Risk Stratification', val: is_high_risk * (coef_r['is_high_risk'] || 0) },
-        { name: 'Age Risk', val: is_high_risk_age * (coef_r['is_high_risk_age'] || 0) },
-        { name: 'Sex (Male)', val: is_male * (coef_r['is_male'] || 0) }
+        { name: 'C1. Tumor Burden', val: (concepts['C1_TumorBurden'] - (mean_r['C1_TumorBurden_SPCA']||0)) * (coef_r['C1_TumorBurden_SPCA'] || 0) },
+        { name: 'C2. Immune Profile', val: (concepts['C2_ImmuneProfile'] - (mean_r['C2_ImmuneProfile_SPCA']||0)) * (coef_r['C2_ImmuneProfile_SPCA'] || 0) },
+        { name: 'C3. CNS Invasion', val: (concepts['C3_CNSInvasion'] - (mean_r['C3_CNSInvasion_SPCA']||0)) * (coef_r['C3_CNSInvasion_SPCA'] || 0) },
+        { name: 'C4. Genetic Risk', val: (concepts['C4_GeneticRisk'] - (mean_r['C4_GeneticRisk_SPCA']||0)) * (coef_r['C4_GeneticRisk_SPCA'] || 0) },
+        { name: 'C5. Inflam & Coag', val: (concepts['C5_InflamCoag'] - (mean_r['C5_InflamCoag_SPCA']||0)) * (coef_r['C5_InflamCoag_SPCA'] || 0) },
+        { name: 'C6. Nutri & Liver', val: (concepts['C6_NutriLiver'] - (mean_r['C6_NutriLiver_SPCA']||0)) * (coef_r['C6_NutriLiver_SPCA'] || 0) },
+        { name: 'High Risk Stratification', val: (is_high_risk - (mean_r['is_high_risk']||0)) * (coef_r['is_high_risk'] || 0) },
+        { name: 'Age Risk', val: (is_high_risk_age - (mean_r['is_high_risk_age']||0)) * (coef_r['is_high_risk_age'] || 0) },
+        { name: 'Sex (Male)', val: (is_male - (mean_r['is_male']||0)) * (coef_r['is_male'] || 0) }
     ];
 
     const contribsD = [
-        { name: 'C1. Tumor Burden', val: concepts['C1_TumorBurden'] * (coef_d['C1_TumorBurden_SPCA'] || 0) },
-        { name: 'C2. Immune Profile', val: concepts['C2_ImmuneProfile'] * (coef_d['C2_ImmuneProfile_SPCA'] || 0) },
-        { name: 'C3. CNS Invasion', val: concepts['C3_CNSInvasion'] * (coef_d['C3_CNSInvasion_SPCA'] || 0) },
-        { name: 'C4. Genetic Risk', val: concepts['C4_GeneticRisk'] * (coef_d['C4_GeneticRisk_SPCA'] || 0) },
-        { name: 'C5. Inflam & Coag', val: concepts['C5_InflamCoag'] * (coef_d['C5_InflamCoag_SPCA'] || 0) },
-        { name: 'C6. Nutri & Liver', val: concepts['C6_NutriLiver'] * (coef_d['C6_NutriLiver_SPCA'] || 0) },
-        { name: 'High Risk Stratification', val: is_high_risk * (coef_d['is_high_risk'] || 0) },
-        { name: 'Age Risk', val: is_high_risk_age * (coef_d['is_high_risk_age'] || 0) },
-        { name: 'Sex (Male)', val: is_male * (coef_d['is_male'] || 0) }
+        { name: 'C1. Tumor Burden', val: (concepts['C1_TumorBurden'] - (mean_d['C1_TumorBurden_SPCA']||0)) * (coef_d['C1_TumorBurden_SPCA'] || 0) },
+        { name: 'C2. Immune Profile', val: (concepts['C2_ImmuneProfile'] - (mean_d['C2_ImmuneProfile_SPCA']||0)) * (coef_d['C2_ImmuneProfile_SPCA'] || 0) },
+        { name: 'C3. CNS Invasion', val: (concepts['C3_CNSInvasion'] - (mean_d['C3_CNSInvasion_SPCA']||0)) * (coef_d['C3_CNSInvasion_SPCA'] || 0) },
+        { name: 'C4. Genetic Risk', val: (concepts['C4_GeneticRisk'] - (mean_d['C4_GeneticRisk_SPCA']||0)) * (coef_d['C4_GeneticRisk_SPCA'] || 0) },
+        { name: 'C5. Inflam & Coag', val: (concepts['C5_InflamCoag'] - (mean_d['C5_InflamCoag_SPCA']||0)) * (coef_d['C5_InflamCoag_SPCA'] || 0) },
+        { name: 'C6. Nutri & Liver', val: (concepts['C6_NutriLiver'] - (mean_d['C6_NutriLiver_SPCA']||0)) * (coef_d['C6_NutriLiver_SPCA'] || 0) },
+        { name: 'High Risk Stratification', val: (is_high_risk - (mean_d['is_high_risk']||0)) * (coef_d['is_high_risk'] || 0) },
+        { name: 'Age Risk', val: (is_high_risk_age - (mean_d['is_high_risk_age']||0)) * (coef_d['is_high_risk_age'] || 0) },
+        { name: 'Sex (Male)', val: (is_male - (mean_d['is_male']||0)) * (coef_d['is_male'] || 0) }
     ];
     
     document.getElementById('contributors-container-r').style.display = 'block';
