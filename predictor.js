@@ -42,6 +42,16 @@ function fillMockData() {
 }
 
 function runPrediction() {
+    // Validation for mandatory fields
+    const ageRaw = document.getElementById('age_months').value;
+    const sexRaw = document.getElementById('sex').value;
+    const riskRaw = document.getElementById('risk_code').value;
+
+    if (ageRaw === "" || sexRaw === "" || riskRaw === "") {
+        alert("Please provide the mandatory Baseline Demographics (Age, Sex, and Clinical Risk Stratification) before calculating.");
+        return;
+    }
+
     // 1. Gather Inputs & Impute
     let d = {};
     const features = [
@@ -50,13 +60,29 @@ function runPrediction() {
         'pct', 'prealbumin', 'csf_rbc'
     ];
     
+    let missingCount = 0;
+
     features.forEach(f => {
         let val = getVal(f);
         if (val === null) {
             val = MODEL_CONFIG.impute_params[f] || 0;
+            if (f !== 'age_months') missingCount++;
         }
         d[f] = val;
     });
+
+    if (document.getElementById('immuno_clean').value === "") missingCount++;
+    if (document.getElementById('fusion_gene_code').value === "") missingCount++;
+    if (document.getElementById('karyo_abn').value === "") missingCount++;
+
+    const warningEl = document.getElementById('missing-data-warning');
+    if (warningEl) {
+        if (missingCount > 7) {
+            warningEl.style.display = 'block';
+        } else {
+            warningEl.style.display = 'none';
+        }
+    }
 
     // 2. Ratios & Safe Division
     let alc = d.alc === 0 ? 0.01 : d.alc;
