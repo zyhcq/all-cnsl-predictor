@@ -263,26 +263,26 @@ function runPrediction() {
     // 11. Calculate Contributions for Explainable AI
     const contribsR = [
         { name: 'C1. Tumor Burden', val: (concepts['C1_TumorBurden'] - (mean_r['C1_TumorBurden_SPCA']||0)) * (coef_r['C1_TumorBurden_SPCA'] || 0) },
-        { name: 'C2. Immune Profile', val: (concepts['C2_ImmuneProfile'] - (mean_r['C2_ImmuneProfile_SPCA']||0)) * (coef_r['C2_ImmuneProfile_SPCA'] || 0) },
+        { name: 'C2. Immune Microenvironment', val: (concepts['C2_ImmuneProfile'] - (mean_r['C2_ImmuneProfile_SPCA']||0)) * (coef_r['C2_ImmuneProfile_SPCA'] || 0) },
         { name: 'C3. CNS Invasion', val: (concepts['C3_CNSInvasion'] - (mean_r['C3_CNSInvasion_SPCA']||0)) * (coef_r['C3_CNSInvasion_SPCA'] || 0) },
         { name: 'C4. Genetic Risk', val: (concepts['C4_GeneticRisk'] - (mean_r['C4_GeneticRisk_SPCA']||0)) * (coef_r['C4_GeneticRisk_SPCA'] || 0) },
-        { name: 'C5. Inflam & Coag', val: (concepts['C5_InflamCoag'] - (mean_r['C5_InflamCoag_SPCA']||0)) * (coef_r['C5_InflamCoag_SPCA'] || 0) },
-        { name: 'C6. Nutri & Liver', val: (concepts['C6_NutriLiver'] - (mean_r['C6_NutriLiver_SPCA']||0)) * (coef_r['C6_NutriLiver_SPCA'] || 0) },
-        { name: 'High Risk Stratification', val: (is_high_risk - (mean_r['is_high_risk']||0)) * (coef_r['is_high_risk'] || 0) },
-        { name: 'Age Risk', val: (is_high_risk_age - (mean_r['is_high_risk_age']||0)) * (coef_r['is_high_risk_age'] || 0) },
-        { name: 'Sex (Male)', val: (is_male - (mean_r['is_male']||0)) * (coef_r['is_male'] || 0) }
+        { name: 'C5. Inflammation & Coagulation', val: (concepts['C5_InflamCoag'] - (mean_r['C5_InflamCoag_SPCA']||0)) * (coef_r['C5_InflamCoag_SPCA'] || 0) },
+        { name: 'C6. Nutrition & Liver Function', val: (concepts['C6_NutriLiver'] - (mean_r['C6_NutriLiver_SPCA']||0)) * (coef_r['C6_NutriLiver_SPCA'] || 0) },
+        { name: 'Clinical Risk Stratification', val: (is_high_risk - (mean_r['is_high_risk']||0)) * (coef_r['is_high_risk'] || 0) },
+        { name: 'Age (months)', val: (is_high_risk_age - (mean_r['is_high_risk_age']||0)) * (coef_r['is_high_risk_age'] || 0) },
+        { name: 'Sex', val: (is_male - (mean_r['is_male']||0)) * (coef_r['is_male'] || 0) }
     ];
 
     const contribsD = [
         { name: 'C1. Tumor Burden', val: (concepts['C1_TumorBurden'] - (mean_d['C1_TumorBurden_SPCA']||0)) * (coef_d['C1_TumorBurden_SPCA'] || 0) },
-        { name: 'C2. Immune Profile', val: (concepts['C2_ImmuneProfile'] - (mean_d['C2_ImmuneProfile_SPCA']||0)) * (coef_d['C2_ImmuneProfile_SPCA'] || 0) },
+        { name: 'C2. Immune Microenvironment', val: (concepts['C2_ImmuneProfile'] - (mean_d['C2_ImmuneProfile_SPCA']||0)) * (coef_d['C2_ImmuneProfile_SPCA'] || 0) },
         { name: 'C3. CNS Invasion', val: (concepts['C3_CNSInvasion'] - (mean_d['C3_CNSInvasion_SPCA']||0)) * (coef_d['C3_CNSInvasion_SPCA'] || 0) },
         { name: 'C4. Genetic Risk', val: (concepts['C4_GeneticRisk'] - (mean_d['C4_GeneticRisk_SPCA']||0)) * (coef_d['C4_GeneticRisk_SPCA'] || 0) },
-        { name: 'C5. Inflam & Coag', val: (concepts['C5_InflamCoag'] - (mean_d['C5_InflamCoag_SPCA']||0)) * (coef_d['C5_InflamCoag_SPCA'] || 0) },
-        { name: 'C6. Nutri & Liver', val: (concepts['C6_NutriLiver'] - (mean_d['C6_NutriLiver_SPCA']||0)) * (coef_d['C6_NutriLiver_SPCA'] || 0) },
-        { name: 'High Risk Stratification', val: (is_high_risk - (mean_d['is_high_risk']||0)) * (coef_d['is_high_risk'] || 0) },
-        { name: 'Age Risk', val: (is_high_risk_age - (mean_d['is_high_risk_age']||0)) * (coef_d['is_high_risk_age'] || 0) },
-        { name: 'Sex (Male)', val: (is_male - (mean_d['is_male']||0)) * (coef_d['is_male'] || 0) }
+        { name: 'C5. Inflammation & Coagulation', val: (concepts['C5_InflamCoag'] - (mean_d['C5_InflamCoag_SPCA']||0)) * (coef_d['C5_InflamCoag_SPCA'] || 0) },
+        { name: 'C6. Nutrition & Liver Function', val: (concepts['C6_NutriLiver'] - (mean_d['C6_NutriLiver_SPCA']||0)) * (coef_d['C6_NutriLiver_SPCA'] || 0) },
+        { name: 'Clinical Risk Stratification', val: (is_high_risk - (mean_d['is_high_risk']||0)) * (coef_d['is_high_risk'] || 0) },
+        { name: 'Age (months)', val: (is_high_risk_age - (mean_d['is_high_risk_age']||0)) * (coef_d['is_high_risk_age'] || 0) },
+        { name: 'Sex', val: (is_male - (mean_d['is_male']||0)) * (coef_d['is_male'] || 0) }
     ];
     
     document.getElementById('contributors-container-r').style.display = 'block';
@@ -307,7 +307,7 @@ function initRadarChart(data) {
     radarChartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: ['Tumor Burden', 'Immune Profile', 'CNS Invasion', 'Genetic Risk', 'Inflammation & Coag', 'Nutri & Liver'],
+            labels: ['Tumor Burden', 'Immune Microenvironment', 'CNS Invasion', 'Genetic Risk', 'Inflammation & Coagulation', 'Nutrition & Liver Function'],
             datasets: [{
                 label: 'Concept Score (Z-score)',
                 data: data,
