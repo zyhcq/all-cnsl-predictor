@@ -298,6 +298,29 @@ const MODEL_CONFIG = {
       ]
     }
   },
+  "systemic_params": {
+    "features": [
+      "C1_TumorBurden_SPCA",
+      "C2_ImmuneProfile_SPCA",
+      "C5_InflamCoag_SPCA",
+      "C6_NutriLiver_SPCA"
+    ],
+    "loadings": [
+      0.6434870576495594,
+      0.5478349894065793,
+      -0.11828264281978618,
+      0.5213544355109798
+    ],
+    "variance_explained": 0.506,
+    "fit_cohort": "Train_70",
+    "orientation": "higher = greater systemic burden",
+    "mean": [
+      0.03149549146218797,
+      0.051705372513258685,
+      0.015046186712858681,
+      0.021788708812533808
+    ]
+  },
   "cox_relapse": {
     "coefficients": {
       "Systemic_axis": 0.06716245754508926,

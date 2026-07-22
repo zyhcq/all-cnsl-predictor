@@ -39,12 +39,10 @@ def main():
     with open(os.path.join(MODEL_DIR, "spca_params.json"), "r", encoding="utf-8") as f:
         spca_params = json.load(f)
         
-    # We need to extract the means of the SPCA variables from the training set,
-    # because SPCA (like PCA) centers the data based on the training mean before projecting.
-    # Oh wait! In SPCA, `SparsePCA`'s `transform()` method automatically centers using `pca.mean_`.
-    # Let's extract `mean_` directly from `final_model_data.csv` which has the _z features.
-    
-    print("Extracting exact SPCA means from final_model_data.csv...")
+    with open(os.path.join(MODEL_DIR, "systemic_axis_params.json"), "r", encoding="utf-8") as f:
+        systemic_params = json.load(f)
+        
+    print("Extracting exact SPCA and PCA means from final_model_data.csv...")
     df_final = pd.read_csv(os.path.join(PROCESSED_DIR, "final_model_data.csv"))
     df_train = df_final[df_final["cohort_role"] == "Train_70"]
     
@@ -52,6 +50,10 @@ def main():
         features = p_data["features"]
         means = df_train[features].mean().tolist()
         spca_params[c_name]["mean"] = means
+        
+    # Extract mean for Systemic Axis PCA
+    systemic_features = systemic_params["features"]
+    systemic_params["mean"] = df_train[systemic_features].mean().tolist()
         
     # To compute _z scores for the UI, we need the mean and std of the raw/log features.
     # Let's compute them dynamically from df_train if they are not saved in scaler_params.json.
@@ -109,6 +111,7 @@ def main():
         "impute_params": impute_params,
         "scaler_params": scaler_params,
         "spca_params": spca_params,
+        "systemic_params": systemic_params,
         "cox_relapse": {
             "coefficients": coef_relapse,
             "norm_mean": norm_mean_relapse,
